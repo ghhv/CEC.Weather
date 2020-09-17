@@ -9,13 +9,13 @@ using CEC.Blazor.Components.Modal;
 
 namespace CEC.Weather.Components
 {
-    public partial class WeatherListForm : ListComponentBase<DbWeatherForecast, WeatherForecastDbContext>
+    public partial class WeatherStationListForm : ListComponentBase<DbWeatherStation, WeatherForecastDbContext>
     {
         /// <summary>
         /// The Injected Controller service for this record
         /// </summary>
         [Inject]
-        protected WeatherForecastControllerService ControllerService { get; set; }
+        protected WeatherStationControllerService ControllerService { get; set; }
 
         /// <summary>
         /// Property referencing the Bootstrap modal instance
@@ -24,7 +24,7 @@ namespace CEC.Weather.Components
 
         protected async override Task OnInitializedAsync()
         {
-            this.UIOptions.MaxColumn = 3;
+            this.UIOptions.MaxColumn = 2;
             this.Service = this.ControllerService;
             await this.Service.Reset();
             await base.OnInitializedAsync();
@@ -45,9 +45,9 @@ namespace CEC.Weather.Components
                     HideHeader = true,
                 };
                 modalOptions.Parameters.Add("ID", id);
-                await this._BootstrapModal.Show<WeatherViewerForm>(modalOptions);
+                await this._BootstrapModal.Show<WeatherForecastViewerForm>(modalOptions);
             }
-            else this.NavigateTo(new EditorEventArgs(PageExitType.ExitToView, id, "WeatherForecast"));
+            else this.NavigateTo(new EditorEventArgs(PageExitType.ExitToView, id, "WeatherStation"));
         }
 
         /// <summary>
@@ -65,9 +65,9 @@ namespace CEC.Weather.Components
                     HideHeader = true
                 };
                 modalOptions.Parameters.Add("ID", id);
-                await this._BootstrapModal.Show<WeatherEditorForm>(modalOptions);
+                await this._BootstrapModal.Show<WeatherForecastEditorForm>(modalOptions);
             }
-            else this.NavigateTo(new EditorEventArgs(PageExitType.ExitToEditor, id, "WeatherForecast"));
+            else this.NavigateTo(new EditorEventArgs(PageExitType.ExitToEditor, id, "WeatherStation"));
         }
 
     }

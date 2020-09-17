@@ -13,12 +13,15 @@ namespace CEC.Blazor.Server.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // Singleton service for the Server Side version of WeatherForecast Data Service 
+            // Singleton service for the Server Side version of each Data Service 
             services.AddSingleton<IWeatherForecastDataService, WeatherForecastServerDataService>();
-            // Scoped service for the WeatherForecast Controller Service
+            services.AddSingleton<IWeatherStationDataService, WeatherStationServerDataService>();
+            // Scoped service for each Controller Service
             services.AddScoped<WeatherForecastControllerService>();
-            // Transient service for the Fluent Validator for the WeatherForecast record
+            services.AddScoped<WeatherStationControllerService>();
+            // Transient service for the Fluent Validator for each record
             services.AddTransient<IValidator<DbWeatherForecast>, WeatherForecastValidator>();
+            services.AddTransient<IValidator<DbWeatherStation>, WeatherStationValidator>();
             // Factory for building the DBContext 
             var dbContext = configuration.GetValue<string>("Configuration:DBContext");
             services.AddDbContextFactory<WeatherForecastDbContext>(options => options.UseSqlServer(dbContext), ServiceLifetime.Singleton);

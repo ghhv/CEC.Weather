@@ -1,10 +1,12 @@
-﻿@page "/WeatherForecastModal"
-@page "/WeatherForecastsModal"
+﻿@page "/WeatherStation"
+
+@layout MainLayout
 
 @namespace CEC.Blazor.Server.Routes
 
 @inherits ApplicationComponentBase
-<WeatherForecastListForm UIOptions="this.UIOptions" ></WeatherForecastListForm>
+
+<WeatherStationListForm UIOptions="this.UIOptions" ></WeatherStationListForm>
 
 @code {
 
@@ -13,9 +15,7 @@
         ListNavigationToViewer = true,
         ShowButtons = true,
         ShowAdd = true,
-        ShowEdit = true,
-        UseModalEditor = true,
-        UseModalViewer = true
+        ShowEdit = true
     };
 
 }

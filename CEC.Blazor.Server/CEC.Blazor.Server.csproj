@@ -24,4 +24,8 @@
     <ProjectReference Include="..\CEC.Weather\CEC.Weather.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Routes\WeatherStation\" />
+  </ItemGroup>
+
 </Project>
