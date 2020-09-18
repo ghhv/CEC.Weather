@@ -1,0 +1,21 @@
+﻿@page "/WeatherReport"
+
+@layout MainLayout
+
+@namespace CEC.Blazor.Server.Routes
+
+@inherits ApplicationComponentBase
+
+<WeatherReportListForm UIOptions="this.UIOptions" ></WeatherReportListForm>
+
+@code {
+
+    public UIOptions UIOptions => new UIOptions()
+    {
+        ListNavigationToViewer = true,
+        ShowButtons = true,
+        ShowAdd = true,
+        ShowEdit = true
+    };
+
+}

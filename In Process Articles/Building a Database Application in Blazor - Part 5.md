@@ -63,6 +63,7 @@ AS
 SELECT        
     R.WeatherReportID as ID, 
     R.WeatherStationID, 
+    R.Date, 
     R.TempMax, 
     R.TempMin, 
     R.FrostDays, 
@@ -70,6 +71,8 @@ SELECT
     R.SunHours, 
     S.Name AS WeatherStationName, 
     'Report For ' + CONVERT(VARCHAR(50), Date, 106) AS DisplayName
+    MONTH(R.Date) AS Month, 
+    YEAR(R.Date) AS Year
 FROM  WeatherReport AS R 
 LEFT INNER JOIN dbo.WeatherStation AS S ON R.WeatherStationID = S.WeatherStationID
 ```

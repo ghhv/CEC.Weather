@@ -49,7 +49,7 @@ namespace CEC.Blazor.Services
         /// <returns></returns>
         public Task<int> GetRecordListCountAsync() => Task.FromResult(0);
 
-        /// <summary>
+                /// <summary>
         /// Method to update a record
         /// </summary>
         /// <param name="record"></param>
@@ -69,6 +69,15 @@ namespace CEC.Blazor.Services
         /// <param name="id"></param>
         /// <returns></returns>
         public Task<DbTaskResult> DeleteRecordAsync(TRecord record) => Task.FromResult(new DbTaskResult() { IsOK = false, Type = MessageType.NotImplemented, Message = "Method not implemented" });
+
+        /// <summary>
+        /// Method to get a dictionary of id/name for a record type
+        /// Used in Lookup Lists
+        /// </summary>
+        /// <typeparam name="TLookup"></typeparam>
+        /// <returns></returns>
+        public Task<SortedDictionary<int, string>> GetLookupListAsync<TLookup>() where TLookup : class, IDbRecord<TLookup> => Task.FromResult(new SortedDictionary<int,string>());
+
 
         /// <summary>
         /// Method to build the a list of SqlParameters for a CUD Stored Procedure

@@ -3,6 +3,8 @@ using CEC.Blazor.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace CEC.Weather.Data
 {
@@ -20,19 +22,19 @@ namespace CEC.Weather.Data
         public int ID { get; set; } = -1;
 
         [SPParameter(DataType = SqlDbType.Int)]
-        public decimal WeatherStationID { get; set; } = -1;
+        public int WeatherStationID { get; set; } = -1;
 
         [SPParameter(DataType = SqlDbType.SmallDateTime)]
         public DateTime Date { get; set; } = DateTime.Now.Date;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
-        public decimal MaxTemp { get; set; } = 1000;
+        public decimal TempMax { get; set; } = 1000;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
-        public decimal MinTemp { get; set; } = 1000;
+        public decimal TempMin { get; set; } = 1000;
 
         [SPParameter(DataType = SqlDbType.Int)]
-        public decimal FrostDays { get; set; } = -1;
+        public int FrostDays { get; set; } = -1;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
         public decimal Rainfall { get; set; } = -1;
@@ -44,6 +46,16 @@ namespace CEC.Weather.Data
 
         public string WeatherStationName { get; set; }
 
+        public int Month { get; set; }
+
+        public int Year { get; set; }
+
+        [NotMapped]
+        public string MonthName => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(this.Month);
+
+        [NotMapped]
+        public string MonthYearName => $"{this.MonthName}-{this.Year}";
+
         public void SetNew() => this.ID = 0;
 
         public DbWeatherReport ShadowCopy()
@@ -51,11 +63,14 @@ namespace CEC.Weather.Data
             return new DbWeatherReport() {
                 ID = this.ID,
                 Date = this.Date,
-                MaxTemp = this.MaxTemp,
-                MinTemp = this.MinTemp,
+                TempMax = this.TempMax,
+                TempMin = this.TempMin,
                 FrostDays = this.FrostDays,
                 Rainfall = this.Rainfall,
-                SunHours = this.SunHours
+                SunHours = this.SunHours,
+                DisplayName = this.DisplayName,
+                WeatherStationID = this.WeatherStationID,
+                WeatherStationName = this.WeatherStationName
             };
         }
     }

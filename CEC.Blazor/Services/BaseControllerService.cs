@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace CEC.Blazor.Services
 {
-    public abstract class BaseControllerService<TRecord, TContext> : 
-        IDisposable, 
-        IControllerPagingService<TRecord>, 
-        IControllerService<TRecord, TContext> 
+    public abstract class BaseControllerService<TRecord, TContext> :
+        IDisposable,
+        IControllerPagingService<TRecord>,
+        IControllerService<TRecord, TContext>
         where TRecord : class, IDbRecord<TRecord>, new()
         where TContext : DbContext
 
@@ -405,6 +405,13 @@ namespace CEC.Blazor.Services
             }
         }
 
+        /// <summary>
+        /// Method to get a lookup list of values for TLookup record
+        /// </summary>
+        /// <typeparam name="TLookup"></typeparam>
+        /// <returns></returns>
+        public async Task<SortedDictionary<int, string>> GetLookUpListAsync<TLookup>() where TLookup : class, IDbRecord<TLookup> => await Service.GetLookupListAsync<TLookup>();
+        
         /// <summary>
         /// Pseudo Dispose Event - not currently used as Services don't have a Dispose event
         /// </summary>

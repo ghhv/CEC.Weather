@@ -72,7 +72,7 @@ namespace CEC.Blazor.Extensions
             var list = new SortedDictionary<int, string>();
             var par = context.GetType().GetProperty(dbSetName ?? IDbRecord<TRecord>.RecordName);
             var set = par.GetValue(context);
-            var sets = (DbSet<IDbRecord<TRecord>>)set;
+            var sets = (DbSet<TRecord>)set;
             await sets.ForEachAsync(item => list.Add(item.ID, item.DisplayName));
             return list;
         }

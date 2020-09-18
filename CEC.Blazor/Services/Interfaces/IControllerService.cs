@@ -153,6 +153,9 @@ namespace CEC.Blazor.Services
         /// <returns></returns>
         public Task<bool> GetNewRecordAsync() => Task.FromResult(false);
 
+
+        public Task<SortedDictionary<int,string>> GetLookUpListAsync<TLookup>() where TLookup : class, IDbRecord<TLookup> => Task.FromResult(new SortedDictionary<int, string>());
+
         /// <summary>
         /// Method to reset the record to new
         /// </summary>
@@ -185,5 +188,12 @@ namespace CEC.Blazor.Services
         /// </summary>
         /// <returns></returns>
         public Task CopyRecordAsync() => Task.CompletedTask;
+
+        /// <summary>
+        /// Method to load any lookup Lists
+        /// </summary>
+        /// <returns></returns>
+        public Task LoadLookups() => Task.CompletedTask;
+
     }
 }

@@ -3,23 +3,22 @@ using CEC.Blazor.Extensions;
 using CEC.Weather.Data;
 using CEC.Weather.Services;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CEC.Weather.Components
 {
-    public partial class WeatherForecastViewerForm : RecordComponentBase<DbWeatherForecast, WeatherForecastDbContext>
+    public partial class WeatherReportViewerForm : RecordComponentBase<DbWeatherReport, WeatherForecastDbContext>
     {
         [Inject]
-        private WeatherForecastControllerService ControllerService { get; set; }
+        private WeatherReportControllerService ControllerService { get; set; }
 
-        public override string PageTitle => $"Weather Forecast Viewer {this.Service?.Record?.Date.AsShortDate() ?? string.Empty}".Trim();
+        public override string PageTitle => (this.Service?.Record?.DisplayName ?? string.Empty).Trim();
 
         protected async override Task OnInitializedAsync()
         {
             this.Service = this.ControllerService;
             // Set the delay on the record load as this is a demo project
-            this.DemoLoadDelay = 250;
+            this.DemoLoadDelay = 0;
             await base.OnInitializedAsync();
         }
 
@@ -27,7 +26,7 @@ namespace CEC.Weather.Components
         {
             var rec = (this._ID + increment) == 0 ? 1 : this._ID + increment;
             rec = rec > this.Service.BaseRecordCount ? this.Service.BaseRecordCount : rec;
-            this.NavManager.NavigateTo($"/WeatherForecast/View?id={rec}");
+            this.NavManager.NavigateTo($"/{this.Service.RecordConfiguration.RecordName}/View?id={rec}");
         }
     }
 }

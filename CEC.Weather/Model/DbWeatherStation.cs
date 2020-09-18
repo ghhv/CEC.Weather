@@ -47,7 +47,8 @@ namespace CEC.Weather.Data
                 ID = this.ID,
                 Latitude = this.Latitude,
                 Longitude = this.Longitude,
-                Elevation = this.Elevation
+                Elevation = this.Elevation,
+                DisplayName = this.DisplayName
             };
         }
     }
