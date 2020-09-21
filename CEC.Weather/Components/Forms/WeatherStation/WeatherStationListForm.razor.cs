@@ -17,16 +17,11 @@ namespace CEC.Weather.Components
         [Inject]
         protected WeatherStationControllerService ControllerService { get; set; }
 
-        /// <summary>
-        /// Property referencing the Bootstrap modal instance
-        /// </summary>
-        private BootstrapModal _BootstrapModal { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
             this.UIOptions.MaxColumn = 2;
             this.Service = this.ControllerService;
-            await this.Service.Reset();
             await base.OnInitializedAsync();
         }
 
@@ -34,41 +29,12 @@ namespace CEC.Weather.Components
         /// Method called when the user clicks on a row in the viewer.
         /// </summary>
         /// <param name="id"></param>
-        protected async void OnView(int id)
-        {
-            if (this.UIOptions.UseModalViewer && this._BootstrapModal != null)
-            {
-                var modalOptions = new BootstrapModalOptions()
-                {
-                    ModalBodyCSS = "p-0",
-                    ModalCSS = "modal-xl",
-                    HideHeader = true,
-                };
-                modalOptions.Parameters.Add("ID", id);
-                await this._BootstrapModal.Show<WeatherForecastViewerForm>(modalOptions);
-            }
-            else this.NavigateTo(new EditorEventArgs(PageExitType.ExitToView, id, "WeatherStation"));
-        }
+        protected void OnView(int id) => this.OnViewAsync<WeatherStationViewerForm>(id);
 
         /// <summary>
         /// Method called when the user clicks on a row Edit button.
         /// </summary>
         /// <param name="id"></param>
-        protected async void OnEdit(int id)
-        {
-            if (this.UIOptions.UseModalEditor && this._BootstrapModal != null)
-            {
-                var modalOptions = new BootstrapModalOptions()
-                {
-                    ModalBodyCSS = "p-0",
-                    ModalCSS = "modal-xl",
-                    HideHeader = true
-                };
-                modalOptions.Parameters.Add("ID", id);
-                await this._BootstrapModal.Show<WeatherForecastEditorForm>(modalOptions);
-            }
-            else this.NavigateTo(new EditorEventArgs(PageExitType.ExitToEditor, id, "WeatherStation"));
-        }
-
+        protected void OnEdit(int id) => this.OnEditAsync<WeatherStationEditorForm>(id);
     }
 }

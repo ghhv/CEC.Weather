@@ -112,7 +112,7 @@ namespace CEC.Blazor.Services
         /// <summary>
         /// Property exposing the number of records in the current list
         /// </summary>
-        public int RecordCount => this.Records?.Count ?? 0;
+        public int RecordCount => this.Records?.Count ?? -1;
 
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace CEC.Blazor.Services
         /// <summary>
         /// Boolean Property used to check if the record list exists
         /// </summary>
-        public bool IsRecords => this.RecordCount > 0;
+        public bool IsRecords => this.RecordCount >= 0;
 
         /// <summary>
         /// Boolean Property used to check if the Data Service is set
@@ -138,7 +138,7 @@ namespace CEC.Blazor.Services
         /// <summary>
         /// Used by the list methods to filter the list contents.
         /// </summary>
-        public virtual FilterList FilterList { get; set; }
+        public virtual IFilterList FilterList { get; set; } = new FilterList();
 
         #endregion
 
@@ -283,11 +283,15 @@ namespace CEC.Blazor.Services
         /// <returns></returns>
         public async virtual Task<List<TRecord>> GetDataPageWithSortingAsync()
         {
+            // Get the filtered list - will only get a new list if the Records property has been set to null elsewhere
             await this.GetFilteredListAsync();
+            // Reset the start record if we are outside the range of the record set - a belt and braces check as this shouldn't happen!
             if (this.PageStartRecord > this.Records.Count) this.CurrentPage = 1;
+            // Check if we have to apply sorting, in not get the page we want
             if (string.IsNullOrEmpty(this.SortColumn)) return this.Records.Skip(this.PageStartRecord).Take(this._PageSize).ToList();
             else
             {
+                //  If we do order the record set and then get the page we want
                 if (this.SortingDirection == SortDirection.Ascending)
                 {
                     return this.Records.OrderBy(x => x.GetType().GetProperty(this.SortColumn).GetValue(x, null)).Skip(this.PageStartRecord).Take(this._PageSize).ToList();
@@ -300,14 +304,15 @@ namespace CEC.Blazor.Services
         }
 
         /// <summary>
-        ///Base implementation that gets the full list.  Override for specific filtering
+        /// Base implementation that gets the record list based on the FilterList.  Override for specific filtering
+        /// Set the record List to null to force a reload
         /// </summary>
         public async virtual Task<bool> GetFilteredListAsync()
         {
+            // Check if the record set is null. and only refresh the record set if it's null
             if (!this.IsRecords)
             {
-                //this.TriggerListChangedEvent(this);
-                this.Records = await this.Service.GetRecordListAsync();
+                this.Records = await this.Service.GetFilteredRecordListAsync(FilterList);
                 return true;
             }
             return false;
@@ -392,17 +397,14 @@ namespace CEC.Blazor.Services
         /// </summary>
         public async virtual Task LoadPagingAsync(bool withDelegate = true)
         {
-            await this.LoadAsync();
             // set the record to null to force a reload of the records
             this.Records = null;
             // if requested adds a default service function to the delegate
-            if (withDelegate)
-            {
-                this.PageLoaderAsync = new IControllerPagingService<TRecord>.PageLoaderDelegateAsync(this.GetDataPageWithSortingAsync);
-                // loads the paging object
-                await this.LoadAsync();
-                this.TriggerListChangedEvent(this);
-            }
+            if (withDelegate) this.PageLoaderAsync = new IControllerPagingService<TRecord>.PageLoaderDelegateAsync(this.GetDataPageWithSortingAsync);
+            // loads the paging object
+            await this.LoadAsync();
+            // Trigger event so any listeners get notified
+            this.TriggerListChangedEvent(this);
         }
 
         /// <summary>
@@ -541,10 +543,13 @@ namespace CEC.Blazor.Services
         /// Moves forward or backwards one block
         /// direction 1 for forwards
         /// direction -1 for backwards
+        /// suppresspageupdate 
+        ///  - set to true (default) when user changes page and the block changes with the page
+        ///  - set to false when user changes block rather than changing page and the page needs to be updated to the first page of the block
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="suppresspageupdate"></param>
-        public void ChangeBlock(int direction, bool suppresspageupdate = true)
+        public async Task ChangeBlockAsync(int direction, bool suppresspageupdate = true)
         {
             if (direction == 1 && this.EndPage < this.TotalPages)
             {
@@ -565,7 +570,7 @@ namespace CEC.Blazor.Services
                 if (this.EndPage + this.PagingBlockSize < this.TotalPages) this.EndPage = this.StartPage + this.PagingBlockSize - 1;
                 else this.EndPage = this.TotalPages;
             }
-            if (!suppresspageupdate) this.Paginate();
+            if (!suppresspageupdate) await this.PaginateAsync();
         }
 
         /// <summary>
@@ -574,13 +579,13 @@ namespace CEC.Blazor.Services
         /// direction -1 for backwards
         /// </summary>
         /// <param name="direction"></param>
-        public void MoveOnePage(int direction)
+        public async Task MoveOnePageAsync(int direction)
         {
             if (direction == 1)
             {
                 if (this.CurrentPage < this.TotalPages)
                 {
-                    if (this.CurrentPage == this.EndPage) ChangeBlock(1);
+                    if (this.CurrentPage == this.EndPage) await ChangeBlockAsync(1);
                     this.CurrentPage += 1;
                 }
             }
@@ -588,21 +593,21 @@ namespace CEC.Blazor.Services
             {
                 if (this.CurrentPage > 1)
                 {
-                    if (this.CurrentPage == this.StartPage) ChangeBlock(-1);
+                    if (this.CurrentPage == this.StartPage) await ChangeBlockAsync(-1);
                     this.CurrentPage -= 1;
                 }
             }
-            this.Paginate();
+            await this.PaginateAsync();
         }
 
         /// <summary>
         /// Moves to the Specified page
         /// </summary>
         /// <param name="pageno"></param>
-        public void GoToPage(int pageno)
+        public async Task GoToPageAsync(int pageno)
         {
             this.CurrentPage = pageno;
-            this.Paginate();
+            await this.PaginateAsync();
         }
 
         /// <summary>
@@ -622,14 +627,17 @@ namespace CEC.Blazor.Services
         /// <returns></returns>
         public async Task<bool> LoadAsync()
         {
+            // Reset the page to 1
             this.CurrentPage = 1;
+            // Check if we have a sort column, if not set to the default column
             if (!string.IsNullOrEmpty(this.DefaultSortColumn)) this.SortColumn = this.DefaultSortColumn;
+            // Set the sort direction to the default
             this.SortingDirection = DefaultSortingDirection;
-            if (this.PageLoaderAsync != null)
-            {
-                this.PagedRecords = await this.PageLoaderAsync();
-            }
-            this.ChangeBlock(0);
+            // Check if we have a method loaded in the PageLoaderAsync delegate and if so run it
+            if (this.PageLoaderAsync != null) this.PagedRecords = await this.PageLoaderAsync();
+            // Set the block back to the start
+            await this.ChangeBlockAsync(0);
+            //  Force a UI update as everything has changed
             this.PageHasChanged?.Invoke(this, this.CurrentPage);
             return true;
         }
@@ -637,17 +645,11 @@ namespace CEC.Blazor.Services
         /// <summary>
         /// Method to trigger the page Changed Event
         /// </summary>
-        public void Paginate()
-        {
-            if (this.PageLoaderAsync != null) this.PaginateAsync().Wait();
-        }
-
-        /// <summary>
-        /// Method to trigger the page Changed Event
-        /// </summary>
         public async Task PaginateAsync()
         {
+            // Check if we have a method loaded in the PageLoaderAsync delegate and if so run it
             if (this.PageLoaderAsync != null) this.PagedRecords = await this.PageLoaderAsync();
+            //  Force a UI update as something has changed
             this.PageHasChanged?.Invoke(this, this.CurrentPage);
         }
 
@@ -656,12 +658,12 @@ namespace CEC.Blazor.Services
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="columnname"></param>
-        public void Sort(object sender, string columnname)
+        public async void Sort(object sender, string columnname)
         {
             this.SortColumn = columnname;
             if (this.SortingDirection == SortDirection.Ascending) SortingDirection = SortDirection.Descending;
             else SortingDirection = SortDirection.Ascending;
-            this.GoToPage(1);
+            await this.GoToPageAsync(1);
         }
 
         /// <summary>

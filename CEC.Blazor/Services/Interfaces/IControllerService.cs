@@ -84,6 +84,11 @@ namespace CEC.Blazor.Services
         public bool IsClean { get; }
 
         /// <summary>
+        /// Filter List for applying to Records List
+        /// </summary>
+        public IFilterList FilterList { get; set; }
+
+        /// <summary>
         /// Event raised when the Record has Changed
         /// </summary>
         public event EventHandler RecordHasChanged;

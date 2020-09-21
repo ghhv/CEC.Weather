@@ -8,12 +8,12 @@ namespace CEC.Blazor.Services
     /// <summary>
     /// Interface for the Paging Component
     /// </summary>
-    public interface IControllerPagingService<T> where T : IDbRecord<T>, new()
+    public interface IControllerPagingService<TRecord> where TRecord : IDbRecord<TRecord>, new()
     {
         /// <summary>
         /// List of the records to display
         /// </summary>
-        public List<T> PagedRecords { get; set; }
+        public List<TRecord> PagedRecords { get; set; }
 
         /// <summary>
         /// current page being Displayed
@@ -109,15 +109,15 @@ namespace CEC.Blazor.Services
 
         /// <summary>
         /// Delegate definition for the Page Loader
-        /// Methods need to conform to the pattern Method(PaginationData<T> param)
+        /// Methods need to conform to the pattern Method(PaginationData<TRecord> param)
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public delegate Task<List<T>> PageLoaderDelegateAsync();
+        public delegate Task<List<TRecord>> PageLoaderDelegateAsync();
 
         /// <summary>
         /// Delegate for the page loaders
-        /// Methods need to conform to the pattern Method(PaginationData<T> param)
+        /// Methods need to conform to the pattern Method(PaginationData<TRecord> param)
         /// </summary>
         public PageLoaderDelegateAsync PageLoaderAsync { get; set; }
 
@@ -128,7 +128,7 @@ namespace CEC.Blazor.Services
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="suppresspageupdate"></param>
-        public void ChangeBlock(int direction, bool suppresspageupdate = true);
+        public Task ChangeBlockAsync(int direction, bool suppresspageupdate = true);
 
         /// <summary>
         /// Moves forward or backwards one page
@@ -136,13 +136,13 @@ namespace CEC.Blazor.Services
         /// direction -1 for backwards
         /// </summary>
         /// <param name="direction"></param>
-        public void MoveOnePage(int direction);
+        public Task MoveOnePageAsync(int direction);
 
         /// <summary>
         /// Moves to the Specified page
         /// </summary>
         /// <param name="pageno"></param>
-        public void GoToPage(int pageno);
+        public Task GoToPageAsync(int pageno);
 
         /// <summary>
         /// Event handler that triggers a reload.
@@ -157,11 +157,6 @@ namespace CEC.Blazor.Services
         /// </summary>
         /// <returns></returns>
         public Task<bool> LoadAsync();
-
-        /// <summary>
-        /// Method to trigger the page Changed Event
-        /// </summary>
-        public void Paginate();
 
         /// <summary>
         /// Method to trigger the page Changed Event

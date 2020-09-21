@@ -3,6 +3,8 @@ using CEC.Weather.Data;
 using CEC.Blazor.Services;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using CEC.Blazor.Components;
 
 namespace CEC.Weather.Services
 {
@@ -14,5 +16,6 @@ namespace CEC.Weather.Services
         {
             this.RecordConfiguration = new RecordConfigurationData() { RecordName = "WeatherStation", RecordDescription = "Weather Station", RecordListName = "WeatherStations", RecordListDecription = "Weather Stations" };
         }
+
     }
 }
