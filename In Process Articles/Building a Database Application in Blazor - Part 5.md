@@ -1326,28 +1326,8 @@ namespace CEC.Blazor.WASM.Server.Controllers
     }
 }
 ```
-```c#
-```
-```c#
-```
-```c#
-```
-
-
-
-
-
-
-
-
 
 ### Wrap Up
-This article gives an overview on building UI Controls with components, and examines some example components in more detail.
+This article demonstrates how to build out either a Blazor WASM or Server project from the CEC.Blazor library though adding a more record types to the Weather Application.
 
-Some key points to note:
-1. Using this methodology, you have control over the HTML and Css markup.
-2. You can use as little or as much abstraction as you wish.
-
-
-```c#
-```
+The final article will look at deploying Blazor Applications.

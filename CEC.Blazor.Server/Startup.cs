@@ -51,6 +51,18 @@ namespace CEC.Blazor.Server
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            //app.Map("/app", app =>
+            //{
+            //    app.UseHttpsRedirection();
+            //    app.UseStaticFiles();
+            //    app.UseBlazorFrameworkFiles();
+            //    app.UseRouting();
+            //    app.UseEndpoints(endpoints =>
+            //    {
+            //        endpoints.MapFallbackToFile("/app/index.html");
+            //    });
+            //});
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
@@ -61,3 +73,4 @@ namespace CEC.Blazor.Server
         }
     }
 }
+//System.InvalidOperationException: 'The EndpointRoutingMiddleware and EndpointMiddleware must be added to the same IApplicationBuilder instance. To use Endpoint Routing with 'Map(...)', make sure to call 'IApplicationBuilder.UseRouting' before 'IApplicationBuilder.UseEndpoints' for each branch of the middleware pipeline.'
