@@ -32,6 +32,9 @@ namespace CEC.Weather.Components
         /// </summary>
         protected override void LoadFilter()
         {
+            // Potentially hug data set so we only show filtered results
+            this.OnlyLoadIfFilter = true;
+            ((CEC.Blazor.Services.IControllerPagingService<DbWeatherReport>)this.Service).DefaultSortColumn = "Date";
             // Before the call to base so the filter is set before the get the list
             if (this.IsService &&  this.WeatherStationID > 0)
             {

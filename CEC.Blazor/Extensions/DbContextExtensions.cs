@@ -34,7 +34,7 @@ namespace CEC.Blazor.Extensions
                 {
                     await cmd.ExecuteNonQueryAsync();
                 }
-                catch {}
+                catch { }
                 finally
                 {
                     cmd.Connection.Close();
@@ -84,7 +84,7 @@ namespace CEC.Blazor.Extensions
                     // Get the filter propertyinfo object
                     var x = typeof(TRecord).GetProperty(filter.Key);
                     // if we have a list already apply the filter to the list
-                    if (list.Count > 0) list.Where(item => x.GetValue(item) == filter.Value).ToList();
+                    if (list.Count > 0) list = list.Where(item => x.GetValue(item).Equals(filter.Value)).ToList();
                     // If this is the first run we query the database directly
                     else if (firstrun) list = await dbset.FromSqlRaw($"SELECT * FROM vw_{ propertyInfo.Name} WHERE {filter.Key} = {filter.Value}").ToListAsync();
                     firstrun = false;

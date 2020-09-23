@@ -64,5 +64,32 @@ namespace CEC.Blazor.Components
             foreach (var set in this.Filters) list.Filters.Add(set.Key, set.Value);
             return list;
         }
+
+        /// <summary>
+        /// Method to get a Filter value
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool TryGetFilter(string name, out object value)
+        {
+            value = null;
+            if (Filters.ContainsKey(name)) value = this.Filters[name];
+            return value != null;
+        }
+
+        /// <summary>
+        /// Method to set a Filter
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool SetFilter(string name, object value)
+        {
+            if (Filters.ContainsKey(name)) this.Filters[name] = value;
+            else Filters.Add(name, value);
+            return Filters.ContainsKey(name);
+        }
+
     }
 }

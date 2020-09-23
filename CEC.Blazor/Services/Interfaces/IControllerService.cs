@@ -89,6 +89,11 @@ namespace CEC.Blazor.Services
         public IFilterList FilterList { get; set; }
 
         /// <summary>
+        /// Event raised when the Filter has Changed
+        /// </summary>
+        public event EventHandler FilterHasChanged;
+
+        /// <summary>
         /// Event raised when the Record has Changed
         /// </summary>
         public event EventHandler RecordHasChanged;
@@ -107,6 +112,22 @@ namespace CEC.Blazor.Services
         /// Event triggered when the record is saved
         /// </summary>
         public event EventHandler OnClean;
+
+        /// <summary>
+        /// Method to trigger a Record Changed Event
+        /// </summary>
+        public void TriggerFilterChangedEvent(object sender);
+
+        /// <summary>
+        /// Method to trigger a Record Changed Event
+        /// </summary>
+        public void TriggerRecordChangedEvent(object sender);
+
+        /// <summary>
+        /// Method to trigger a List Changed Event
+        /// </summary>
+        public void TriggerListChangedEvent(object sender);
+
 
         /// <summary>
         /// Method to Reset the Service to New condition

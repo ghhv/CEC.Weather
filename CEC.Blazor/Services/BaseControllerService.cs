@@ -168,6 +168,11 @@ namespace CEC.Blazor.Services
         /// </summary>
         public event EventHandler ListHasChanged;
 
+        /// <summary>
+        /// Event triggered whwen the list has changed
+        /// </summary>
+        public event EventHandler FilterHasChanged;
+
         #endregion
 
         public BaseControllerService(IConfiguration configuration, NavigationManager navigationManager)
@@ -191,6 +196,11 @@ namespace CEC.Blazor.Services
             this.BaseRecordCount = await this.Service.GetRecordListCountAsync();
             this.SetClean();
         }
+
+        /// <summary>
+        /// Method to trigger a Record Changed Event
+        /// </summary>
+        public virtual void TriggerFilterChangedEvent(object sender) => this.FilterHasChanged?.Invoke(sender, EventArgs.Empty);
 
         /// <summary>
         /// Method to trigger a Record Changed Event

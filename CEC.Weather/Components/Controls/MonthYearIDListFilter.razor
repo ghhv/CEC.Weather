@@ -1,0 +1,37 @@
+﻿@using CEC.Blazor.Components.FormControls
+@using Microsoft.AspNetCore.Components.Forms
+
+@namespace CEC.Weather.Components
+@inherits ComponentBase
+
+<EditForm EditContext="this.EditContext">
+
+    <table class="table">
+        <tr>
+            @if (this.ShowID)
+            {
+                <!--Farm-->
+                <td>
+                    <label class="" for="FarmID">Farm:</label>
+                    <div class="">
+                        <InputControlSelect OptionList="this.IdLookupList" @bind-Value="this.ID" DefaultKey="0" DefaultValue="-- ALL STATIONS --" ShowDefaultOption="true"></InputControlSelect>
+                    </div>
+                </td>
+            }
+            <td>
+                <!--Month-->
+                <label class="">Month:</label>
+                <div class="">
+                    <InputControlSelect OptionList="this.MonthLookupList" @bind-Value="this.Month" DefaultKey="0" DefaultValue="-- ALL MONTHS --" ShowDefaultOption="true"></InputControlSelect>
+                </div>
+            </td>
+            <td>
+                <!--Year-->
+                <label class="">Year:</label>
+                <div class="">
+                    <InputControlSelect OptionList="this.YearLookupList" @bind-Value="this.Year" DefaultKey="0" DefaultValue="-- ALL YEARS --" ShowDefaultOption="true"></InputControlSelect>
+                </div>
+            </td>
+        </tr>
+    </table>
+</EditForm>
