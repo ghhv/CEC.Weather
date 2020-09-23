@@ -26,6 +26,12 @@ namespace CEC.Blazor.Components.BaseForms
         protected BootstrapModal _BootstrapModal { get; set; }
 
         /// <summary>
+        /// Boolean used by Filter set to true if you want empty recordset if no filter is set
+        /// </summary>
+        [Parameter]
+        public bool OnlyLoadIfFilter { get; set; } = false;
+
+        /// <summary>
         /// constructed Value for the List Title based on the RecordConfiguration
         /// </summary>
         [Parameter]
@@ -49,9 +55,23 @@ namespace CEC.Blazor.Components.BaseForms
         protected async override Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
-            // Load the page - as we've reset everything this will be the first page with the default filters
-            if (this.IsService) await this.Service.LoadPagingAsync();
+            // Load the page - as we've reset everything this will be the first page with the default filter
+            if (this.IsService)
+            {
+                // Load the filters for the recordset
+                this.LoadFilter();
+                // Load the paged recordset
+                await this.Service.LoadPagingAsync();
+            }
             this.Loading = false;
+        }
+
+        /// <summary>
+        /// Method called to load the filter
+        /// </summary>
+        protected virtual void LoadFilter()
+        {
+            if (IsService) this.Service.FilterList.OnlyLoadIfFilters = this.OnlyLoadIfFilter;
         }
 
         /// <summary>

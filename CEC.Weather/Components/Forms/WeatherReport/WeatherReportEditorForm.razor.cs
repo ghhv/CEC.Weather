@@ -14,8 +14,6 @@ namespace CEC.Weather.Components
 
         public SortedDictionary<int, string> StationLookupList { get; set; }
 
-        private string CardCSS => this.IsModal ? "m-0" : "";
-
         protected async override Task OnInitializedAsync()
         {
             // Assign the correct controller service
@@ -28,6 +26,7 @@ namespace CEC.Weather.Components
         protected async override Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
+            // Method to get the Station Lookup List. Called here so whenever we do a UI refresh we get the list, we never know 
             StationLookupList = await this.Service.GetLookUpListAsync<DbWeatherStation>();
         }
 

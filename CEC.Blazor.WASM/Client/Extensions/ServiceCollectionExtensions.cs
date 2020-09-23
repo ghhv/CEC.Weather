@@ -11,12 +11,18 @@ namespace CEC.Blazor.WASM.Client.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
 
-            // Scoped service for the WASM Client version of WeatherForecast Data Service 
+            // Scoped service for the WASM Client version of Data Services 
             services.AddScoped<IWeatherForecastDataService, WeatherForecastWASMDataService>();
-            // Scoped service for the WeatherForecast Controller Service
+            services.AddScoped<IWeatherStationDataService, WeatherStationWASMDataService>();
+            services.AddScoped<IWeatherReportDataService, WeatherReportWASMDataService>();
+            // Scoped service for the Controller Services
             services.AddScoped<WeatherForecastControllerService>();
-            // Transient service for the Fluent Validator for the WeatherForecast record
+            services.AddScoped<WeatherStationControllerService>();
+            services.AddScoped<WeatherReportControllerService>();
+            // Transient service for the Fluent Validator for the records
             services.AddTransient<IValidator<DbWeatherForecast>, WeatherForecastValidator>();
+            services.AddTransient<IValidator<DbWeatherStation>, WeatherStationValidator>();
+            services.AddTransient<IValidator<DbWeatherReport>, WeatherReportValidator>();
             return services;
         }
     }

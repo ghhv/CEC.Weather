@@ -3,9 +3,6 @@ using CEC.Blazor.Components.BaseForms;
 using CEC.Weather.Data;
 using CEC.Weather.Services;
 using System.Threading.Tasks;
-using CEC.Blazor.Components;
-using CEC.Blazor.Components.UIControls;
-using CEC.Blazor.Components.Modal;
 
 namespace CEC.Weather.Components
 {

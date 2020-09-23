@@ -7,7 +7,11 @@ using CEC.Blazor.WASM.Server.Extensions;
 using Microsoft.EntityFrameworkCore;
 using CEC.Blazor.Extensions;
 using CEC.Weather.Data;
-
+using System.Linq;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace CEC.Blazor.WASM.Server
 {

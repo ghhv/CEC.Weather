@@ -67,19 +67,8 @@
         <UIContainer>
 
             <UIRow>
-                <UIButtonColumn Columns="6">
 
-                    <UIButton Show="this.IsLoaded" ColourCode="Bootstrap.ColourCode.dark" ClickEvent="(e => this.NextRecord(-1))">
-                        Previous
-                    </UIButton>
-
-                    <UIButton Show="this.IsLoaded" ColourCode="Bootstrap.ColourCode.dark" ClickEvent="(e => this.NextRecord(1))">
-                        Next
-                    </UIButton>
-
-                </UIButtonColumn>
-
-                <UIButtonColumn Columns="6">
+                <UIButtonColumn Columns="12">
 
                     <UIButton Show="!this.IsModal" ColourCode="Bootstrap.ColourCode.nav" ClickEvent="(e => this.NavigateTo(PageExitType.ExitToList))">
                         Exit To List

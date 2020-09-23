@@ -28,18 +28,22 @@ namespace CEC.Weather.Data
         public DateTime Date { get; set; } = DateTime.Now.Date;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName = "decimal(8,4)")]
         public decimal TempMax { get; set; } = 1000;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName = "decimal(8,4)")]
         public decimal TempMin { get; set; } = 1000;
 
         [SPParameter(DataType = SqlDbType.Int)]
         public int FrostDays { get; set; } = -1;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName = "decimal(8,4)")]
         public decimal Rainfall { get; set; } = -1;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName = "decimal(8,2)")]
         public decimal SunHours { get; set; } = -1;
 
         public string DisplayName { get; set; }

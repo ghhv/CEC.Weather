@@ -12,9 +12,9 @@ namespace CEC.Weather.Data
     /// Data validation is handled by the Fluent Validator
     /// Custom Attributes are for building the EF strored procedures
     /// </summary>
-    public class DbWeatherStation :IDbRecord<DbWeatherStation>
+    public class DbWeatherStation 
+        :IDbRecord<DbWeatherStation>
     {
-
         [NotMapped]
         public int WeatherStationID { get => this.ID; }
 
@@ -25,12 +25,15 @@ namespace CEC.Weather.Data
         public string Name { get; set; } = "No Name";
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName ="decimal(8,4)")]
         public decimal Latitude { get; set; } = 1000;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName = "decimal(8,4)")]
         public decimal Longitude { get; set; } = 1000;
 
         [SPParameter(DataType = SqlDbType.Decimal)]
+        [Column(TypeName = "decimal(8,2)")]
         public decimal Elevation { get; set; } = 1000;
 
         public string DisplayName { get; set; }

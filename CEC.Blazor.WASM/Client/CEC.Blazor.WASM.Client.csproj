@@ -18,4 +18,19 @@
     <ProjectReference Include="..\..\CEC.Weather\CEC.Weather.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Routes\WeatherForecasts\WeatherForecastEditorView.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Routes\WeatherForecasts\WeatherForecastListModalView.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Routes\WeatherForecasts\WeatherForecastListView.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Routes\WeatherForecasts\WeatherForecastViewerView.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

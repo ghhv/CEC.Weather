@@ -312,7 +312,8 @@ namespace CEC.Blazor.Services
             // Check if the record set is null. and only refresh the record set if it's null
             if (!this.IsRecords)
             {
-                this.Records = await this.Service.GetFilteredRecordListAsync(FilterList);
+                if (this.FilterList.Load) this.Records = await this.Service.GetFilteredRecordListAsync(FilterList);
+                else this.Records =  new List<TRecord>();
                 return true;
             }
             return false;

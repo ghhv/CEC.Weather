@@ -12,7 +12,7 @@ namespace CEC.Weather.Services
     {
         public WeatherReportWASMDataService(IConfiguration configuration, HttpClient httpClient) : base(configuration, httpClient)
         {
-            this.RecordConfiguration = new RecordConfigurationData() { RecordName = "WeatherReport", RecordDescription = "Weather Report", RecordListName = "WeatherReports", RecordListDecription = "Weather Reports" };
+            this.RecordConfiguration = new RecordConfigurationData() { RecordName = "WeatherReport", RecordDescription = "Weather Report", RecordListName = "WeatherReport", RecordListDecription = "Weather Reports" };
         }
     }
 }

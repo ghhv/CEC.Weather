@@ -2,6 +2,8 @@
 @using CEC.Blazor.Components.BaseForms
 @using CEC.Blazor.Components.UIControls
 @using CEC.Weather.Data
+@using CEC.Weather.Extensions
+@using CEC.Blazor.Extensions
 
 @namespace CEC.Weather.Components
 
@@ -32,9 +34,9 @@
 
                 <UIGridTableColumn TRecord="DbWeatherStation" Column="1">@context.ID</UIGridTableColumn>
                 <UIGridTableColumn TRecord="DbWeatherStation" Column="2">@context.Name</UIGridTableColumn>
-                <UIGridTableColumn TRecord="DbWeatherStation" Column="3">@context.Latitude</UIGridTableColumn>
-                <UIGridTableColumn TRecord="DbWeatherStation" Column="4">@context.Longitude</UIGridTableColumn>
-                <UIGridTableColumn TRecord="DbWeatherStation" Column="5">@context.Elevation</UIGridTableColumn>
+                <UIGridTableColumn TRecord="DbWeatherStation" Column="3">@context.Latitude.AsLatitude()</UIGridTableColumn>
+                <UIGridTableColumn TRecord="DbWeatherStation" Column="4">@context.Longitude.AsLongitude()</UIGridTableColumn>
+                <UIGridTableColumn TRecord="DbWeatherStation" Column="5">@context.Elevation.DecimalPlaces(1)</UIGridTableColumn>
                 <UIGridTableEditColumn TRecord="DbWeatherStation"></UIGridTableEditColumn>
 
             </CascadingValue>

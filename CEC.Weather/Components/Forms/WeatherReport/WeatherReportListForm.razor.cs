@@ -25,12 +25,20 @@ namespace CEC.Weather.Components
             this.UIOptions.MaxColumn = 2;
             this.Service = this.ControllerService;
             await base.OnInitializedAsync();
-            // add after the base as base resets the service and the filter
-            if (this.WeatherStationID > 0)
+        }
+
+        /// <summary>
+        /// inherited - loads the filter
+        /// </summary>
+        protected override void LoadFilter()
+        {
+            // Before the call to base so the filter is set before the get the list
+            if (this.IsService &&  this.WeatherStationID > 0)
             {
                 this.Service.FilterList.Filters.Clear();
                 this.Service.FilterList.Filters.Add("WeatherStationID", this.WeatherStationID);
             }
+            base.LoadFilter();
         }
 
         /// <summary>

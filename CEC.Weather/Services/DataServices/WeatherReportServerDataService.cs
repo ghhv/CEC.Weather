@@ -16,7 +16,7 @@ namespace CEC.Weather.Services
     {
         public WeatherReportServerDataService(IConfiguration configuration, IDbContextFactory<WeatherForecastDbContext> dbcontext) : base(configuration, dbcontext)
         {
-            this.RecordConfiguration = new RecordConfigurationData() { RecordName = "WeatherReport", RecordDescription = "Weather Report", RecordListName = "WeatherReports", RecordListDecription = "Weather Reports" };
+            this.RecordConfiguration = new RecordConfigurationData() { RecordName = "WeatherReport", RecordDescription = "Weather Report", RecordListName = "WeatherReport", RecordListDecription = "Weather Reports" };
         }
     }
 }

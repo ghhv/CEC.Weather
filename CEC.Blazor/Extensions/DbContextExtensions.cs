@@ -67,11 +67,16 @@ namespace CEC.Blazor.Extensions
         /// <returns></returns>
         public async static Task<List<TRecord>> GetRecordFilteredListAsync<TRecord>(this DbContext context, IFilterList filterList, string dbSetName = null) where TRecord : class, IDbRecord<TRecord>
         {
-            var par = context.GetType().GetProperty(dbSetName ?? IDbRecord<TRecord>.RecordName);
-            var set = par.GetValue(context);
-            var dbset = (DbSet<TRecord>)set;
+            var firstrun = true;
+            // Get the PropertInfo object for the record DbSet
+            var propertyInfo = context.GetType().GetProperty(dbSetName ?? IDbRecord<TRecord>.RecordName);
+            // Get the actual value and cast it correctly
+            var dbset = (DbSet<TRecord>)(propertyInfo.GetValue(context));
+            // Get a empty list
             var list = new List<TRecord>();
             // if we have a filter go through each filter
+            // note that only the first filter runs a SQL query against the database
+            // the rest are run against the dataset.  So do the biggest slice with the first filter for maximum efficiency.
             if (filterList != null && filterList.Filters.Count > 0)
             {
                 foreach (var filter in filterList.Filters)
@@ -80,11 +85,12 @@ namespace CEC.Blazor.Extensions
                     var x = typeof(TRecord).GetProperty(filter.Key);
                     // if we have a list already apply the filter to the list
                     if (list.Count > 0) list.Where(item => x.GetValue(item) == filter.Value).ToList();
-                    // If we have an empty list we can query the database directly
-                    else list = await dbset.FromSqlRaw($"SELECT * FROM vw_{ par.Name} WHERE {filter.Key} = {filter.Value}").ToListAsync();
+                    // If this is the first run we query the database directly
+                    else if (firstrun) list = await dbset.FromSqlRaw($"SELECT * FROM vw_{ propertyInfo.Name} WHERE {filter.Key} = {filter.Value}").ToListAsync();
+                    firstrun = false;
                 }
             }
-            //  No list, just get the full list
+            //  No list, just get the full recordset
             else list = await dbset.ToListAsync();
             return list;
         }
@@ -144,8 +150,7 @@ namespace CEC.Blazor.Extensions
             // Get the property info object for the DbSet 
             var pinfo = context.GetType().GetProperty(dbSetName ?? IDbRecord<TRecord>.RecordName);
             // Get the property DbSet
-            var set = pinfo.GetValue(context);
-            return (DbSet<TRecord>)set;
+            return (DbSet<TRecord>)pinfo.GetValue(context);
         }
 
     }

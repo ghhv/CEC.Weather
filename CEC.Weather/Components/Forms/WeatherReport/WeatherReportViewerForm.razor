@@ -1,11 +1,10 @@
-﻿@namespace CEC.Weather.Components
-@using CEC.Blazor.Components
+﻿@using CEC.Blazor.Components
 @using CEC.Blazor.Components.BaseForms
 @using CEC.Blazor.Components.UIControls
 @using CEC.Weather.Data
-@using CEC.Weather.Extensions
 @using CEC.FormControls.Components.FormControls
 
+@namespace CEC.Weather.Components
 @inherits RecordComponentBase<DbWeatherReport, WeatherForecastDbContext>
 
 <UICard>
@@ -102,19 +101,8 @@
         <UIContainer>
 
             <UIRow>
-                <UIButtonColumn Columns="6">
 
-                    <UIButton Show="this.IsLoaded" ColourCode="Bootstrap.ColourCode.dark" ClickEvent="(e => this.NextRecord(-1))">
-                        Previous
-                    </UIButton>
-
-                    <UIButton Show="this.IsLoaded" ColourCode="Bootstrap.ColourCode.dark" ClickEvent="(e => this.NextRecord(1))">
-                        Next
-                    </UIButton>
-
-                </UIButtonColumn>
-
-                <UIButtonColumn Columns="6">
+                <UIButtonColumn Columns="12">
 
                     <UIButton Show="!this.IsModal" ColourCode="Bootstrap.ColourCode.nav" ClickEvent="(e => this.NavigateTo(PageExitType.ExitToList))">
                         Exit To List
