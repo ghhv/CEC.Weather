@@ -22,7 +22,7 @@ namespace CEC.Weather.Components
 
         protected async override Task OnInitializedAsync()
         {
-            this.UIOptions.MaxColumn = 2;
+            this.UIOptions.MaxColumn = 3;
             this.Service = this.ControllerService;
             await base.OnInitializedAsync();
         }
@@ -32,8 +32,6 @@ namespace CEC.Weather.Components
         /// </summary>
         protected override void LoadFilter()
         {
-            // Potentially hug data set so we only show filtered results
-            this.OnlyLoadIfFilter = true;
             ((CEC.Blazor.Services.IControllerPagingService<DbWeatherReport>)this.Service).DefaultSortColumn = "Date";
             // Before the call to base so the filter is set before the get the list
             if (this.IsService &&  this.WeatherStationID > 0)

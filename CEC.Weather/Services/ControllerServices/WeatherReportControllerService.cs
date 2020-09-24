@@ -24,7 +24,7 @@ namespace CEC.Weather.Services
 
         public async Task LoadLookups()
         {
-            this.StationLookupList = await this.Service.GetLookupListAsync<DbWeatherStation>();
+            this.StationLookupList = await this.GetLookUpListAsync<DbWeatherStation>();
         }
     }
 }

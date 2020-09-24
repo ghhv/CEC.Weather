@@ -8,7 +8,7 @@ using CEC.FormControls.Components.FormControls;
 
 namespace CEC.Blazor.Components.FormControls
 {
-    public partial class InputControlSelect<T> : FormControlBase<T>
+    public partial class InputControlSelect<T> : FormRecordControlBase<T>
     {
         [Parameter]
         public string Id { get; set; }
@@ -36,9 +36,6 @@ namespace CEC.Blazor.Components.FormControls
 
         [Parameter]
         public SortedDictionary<T, string> OptionList { get; set; }
-
-        [Parameter]
-        public bool Locked { get; set; } = false;
 
         protected override void OnInitialized()
         {

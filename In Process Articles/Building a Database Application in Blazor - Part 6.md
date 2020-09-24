@@ -1,18 +1,20 @@
 # Building a Database Appication in Blazor 
 # Part 5 - Adding new  Record Types to Weather Projects
 
-This is the fifth article in the series and walks through adding new records to the Weather Application. We are going to import station data from the UK Met Office.  There's an command line importer project includes in the solution to fetch and import the data.  This is monthly data from British Weather Stations going back to 1928.  We will add two new record types:
+This is the fifth article in the series and walks through adding new records to the Weather Application. We are going to import station data from the UK Met Office.  There's an command line importer project included in the solution to fetch and import the data.  This is monthly data from British Weather Stations going back to 1928.  We'll add two record types:
 
 * Weather Stations
 * Weather Reports from Stations
 
-As we are going to build both Server and WASM deployments, we have 4 projects where we will be adding code:
+And all the infrastructure to provide UI Crud operations on these two records.
+
+We will build both Server and WASM deployments, so we have 4 projects where we will be adding code:
 1. **CEC.Weather** - the shared project library
 2. **CEC.Blazor.Server** - the Server Project
 3. **CEC.Blazor.WASM.Client** - the WASM project
 4. **CEC.Blazor.WASM.Server** - the API server for the WASM project
 
-The majority of code is shared, so in CEC.Weather.
+The majority of code is library code in CEC.Weather.
 
 ## Sample Project and Code
 
@@ -25,7 +27,7 @@ The completed code for this article is in [CEC.Weather GitHub Repository](https:
 2. Add the Models, Services and Forms to the CEC.Weather Library
 3. Add the Views and configure the Services in the Blazor.CEC.Server project.
 4. Add the Views and configure the Services in the Blazor.CEC.WASM.Client project.
-4. Add the Controllers and configure the Services in the Blazor.CEC.WASM.Server project.
+5. Add the Controllers and configure the Services in the Blazor.CEC.WASM.Server project.
 
 ## Database
 
@@ -400,10 +402,13 @@ public class DbWeatherReport :IDbRecord<DbWeatherReport>
 
 ### Update WeatherForecastDbContext
 
-Add two new *DbSet* properties to the class and two *modelBuilder* calls to *OnModelCreating*. 
+Add two new *DbSet* properties to the class and two *modelBuilder* calls to *OnModelCreating*.  Add *DistinctList* for using in lists for filter Selects(will see it later).
 ```c#
 // CEC.Weather/Data/WeatherForecastDbContext.cs
 ......
+
+public DbSet<DbDistinct> DistinctList { get; set; }
+
 public DbSet<DbWeatherStation> WeatherStation { get; set; }
 
 public DbSet<DbWeatherReport> WeatherReport { get; set; }
@@ -866,12 +871,7 @@ You can get these from the GitHub Repository.  They are the same as the Station 
         Station:
     </UILabelColumn>
     <UIColumn Columns="4">
-        <FormControlSelect class="form-control" @bind-Value="this.Service.Record.WeatherStationID" RecordValue="@this.Service.ShadowRecord.WeatherStationID">
-            @foreach (var item in this.StationLookupList)
-            {
-                <option value="@item.Key">@item.Value</option>
-            }
-        </FormControlSelect>
+        <InputControlSelect OptionList="this.StationLookupList" @bind-Value="this.Service.Record.WeatherStationID" RecordValue="@this.Service.ShadowRecord.WeatherStationID"></InputControlSelect>
     </UIColumn>
 </UIFormRow>
 ```
@@ -1010,6 +1010,192 @@ Add the menu link in *NavMenu*.
     ......
 ```
 
+### Filter Control
+
+Add a new control called *MonthYearIDListFilter*. This is used in the *WestherReport* list View to filter the records.  The code is below.
+
+```c#
+// CEC.Weather/Components/Controls/MonthYearIDListFilter.razor.cs
+using CEC.Blazor.Data;
+using CEC.Weather.Data;
+using CEC.Weather.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
+
+namespace CEC.Weather.Components
+{
+    public partial class MonthYearIDListFilter : ComponentBase
+    {
+        // Inject the Controller Service
+        [Inject]
+        private WeatherReportControllerService Service { get; set; }
+
+        // Boolean to control the ID Control Display
+        [Parameter]
+        public bool ShowID { get; set; } = true;
+
+        // Month Lookup List
+        private SortedDictionary<int, string> MonthLookupList { get; set; }
+
+        // Year Lookup List
+        private SortedDictionary<int, string> YearLookupList { get; set; }
+
+        // Weather Station Lookup List
+        private SortedDictionary<int, string> IdLookupList { get; set; }
+
+        // Dummy Edit Context for selects
+        private EditContext EditContext => new EditContext(this.Service.Record);
+
+        // privates to hold current select values
+        private int OldMonth = 0;
+        private int OldYear = 0;
+        private long OldID = 0;
+
+        // Month value - adds or removes the value from the filter list and kicks off Filter changed if changed
+        private int Month
+        {
+            get => this.Service.FilterList.TryGetFilter("Month", out object value) ? (int)value : 0;
+            set
+            {
+                if (value > 0) this.Service.FilterList.SetFilter("Month", value);
+                else this.Service.FilterList.ClearFilter("Month");
+                if (this.Month != this.OldMonth)
+                {
+                    this.OldMonth = this.Month;
+                    this.Service.TriggerFilterChangedEvent(this);
+                }
+            }
+        }
+
+        // Year value - adds or removes the value from the filter list and kicks off Filter changed if changed
+        private int Year
+        {
+            get => this.Service.FilterList.TryGetFilter("Year", out object value) ? (int)value : 0;
+            set
+            {
+                if (value > 0) this.Service.FilterList.SetFilter("Year", value);
+                else this.Service.FilterList.ClearFilter("Year");
+                if (this.Year != this.OldYear)
+                {
+                    this.OldYear = this.Year;
+                    this.Service.TriggerFilterChangedEvent(this);
+                }
+            }
+        }
+
+        // Weather Station value - adds or removes the value from the filter list and kicks off Filter changed if changed
+        private int ID
+        {
+            get => this.Service.FilterList.TryGetFilter("WeatherStationID", out object value) ? (int)value : 0;
+            set
+            {
+                if (value > 0) this.Service.FilterList.SetFilter("WeatherStationID", value);
+                else this.Service.FilterList.ClearFilter("WeatherStationID");
+                if (this.ID != this.OldID)
+                {
+                    this.OldID = this.ID;
+                    this.Service.TriggerFilterChangedEvent(this);
+                }
+            }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            this.OldYear = this.Year;
+            this.OldMonth = this.Month;
+            await GetLookupsAsync();
+        }
+
+        // Method to get he LokkupLists
+        protected async Task GetLookupsAsync()
+        {
+            this.IdLookupList = await this.Service.GetLookUpListAsync<DbWeatherStation>("-- ALL STATIONS --");
+            // Get the months in the year
+            this.MonthLookupList = new SortedDictionary<int, string> { { 0, "-- ALL MONTHS --" } };
+            for (int i = 1; i < 13; i++) this.MonthLookupList.Add(i, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i));
+            // Gets a distinct list of Years in the Weather Reports
+            {
+                var list = await this.Service.GetDistinctListAsync(new DbDistinctRequest() { FieldName = "Year", QuerySetName = "WeatherReport", DistinctSetName = "DistinctList" });
+                this.YearLookupList = new SortedDictionary<int, string> { { 0, "-- ALL YEARS --" } };
+                list.ForEach(item => this.YearLookupList.Add(int.Parse(item), item));
+            }
+
+        }
+    }
+}
+```
+```c#
+// CEC.Weather/Components/Controls/MonthYearIDListFilter.razor
+@using CEC.Blazor.Components.FormControls
+@using Microsoft.AspNetCore.Components.Forms
+
+@namespace CEC.Weather.Components
+@inherits ComponentBase
+
+<EditForm EditContext="this.EditContext">
+
+    <table class="table">
+        <tr>
+            @if (this.ShowID)
+            {
+                <!--Farm-->
+                <td>
+                    <label class="" for="ID">Weather Station:</label>
+                    <div class="">
+                        <InputControlSelect OptionList="this.IdLookupList" @bind-Value="this.ID"></InputControlSelect>
+                    </div>
+                </td>
+            }
+            <td>
+                <!--Month-->
+                <label class="">Month:</label>
+                <div class="">
+                    <InputControlSelect OptionList="this.MonthLookupList" @bind-Value="this.Month"></InputControlSelect>
+                </div>
+            </td>
+            <td>
+                <!--Year-->
+                <label class="">Year:</label>
+                <div class="">
+                    <InputControlSelect OptionList="this.YearLookupList" @bind-Value="this.Year"></InputControlSelect>
+                </div>
+            </td>
+        </tr>
+    </table>
+</EditForm>
+```
+ The filter displays a set of dropdowns.  When you change a value, the value is added, updated or deleted in the filter list and the service FilterUpdated event is kicked off.  The List Form has registered with this event, resets and reloads the recordset (with the updated filter) and refresh the display.
+
+```c#
+// CEC.Blazor/Components/BaseForms/ListComponentBase.cs
+.........
+protected override void OnAfterRender(bool firstRender)
+{
+    if (firstRender)
+    {
+        this.Paging.PageHasChanged += this.UpdateUI;
+        this.Service.ListHasChanged += this.OnRecordsUpdate;
+        // Register the FilterChanged event hsandler with the Service FilterHasChanged event
+        this.Service.FilterHasChanged += this.FilterUpdated;
+    }
+    base.OnAfterRender(firstRender);
+}
+........
+protected virtual async void FilterUpdated(object sender, EventArgs e)
+{
+    // reset the List
+    await this.Service.ResetListAsync();
+    // kick off a Paging Load
+    await this.Paging.LoadAsync();
+    // Update the UI to show the new recordset
+    await InvokeAsync(this.StateHasChanged);
+}
+.......
+```
+
 ## CEC.Blazor.Server
 
 We've now added all the shared code and need to move down to the actual projects.
@@ -1104,6 +1290,7 @@ The view is a little more complicated.  In addition to the View Form we add the 
 @namespace CEC.Blazor.Server.Routes
 
 ```
+*WeatherReportListView* used the *MonthYearIdListFilter* to control the Weather Report List.  Note *OnlyLoadIfFilter* is set to true to prevent the full recordset being displayed.
 ```c#
 // CEC.Blazor.Server/Routes/WeatherReport/WeatherReportListView.razor
 @page "/WeatherReport"
@@ -1111,7 +1298,8 @@ The view is a little more complicated.  In addition to the View Form we add the 
 @namespace CEC.Blazor.Server.Routes
 @inherits ApplicationComponentBase
 
-<WeatherReportListForm UIOptions="this.UIOptions" ></WeatherReportListForm>
+<MonthYearIDListFilter></MonthYearIDListFilter>
+<WeatherReportListForm OnlyLoadIfFilter="true" UIOptions="this.UIOptions"></WeatherReportListForm>
 
 @code {
     public UIOptions UIOptions => new UIOptions()
@@ -1237,6 +1425,9 @@ namespace CEC.Blazor.WASM.Server.Controllers
         [HttpPost]
         public async Task<List<DbWeatherStation>> GetFilteredRecordListAsync([FromBody] FilterList filterList) => await DataService.GetFilteredRecordListAsync(filterList);
 
+        [MVC.Route("weatherstation/base")]
+        public async Task<List<DbBaseRecord>> GetBaseAsync() => await DataService.GetBaseRecordListAsync<DbWeatherStation>();
+
         [MVC.Route("weatherstation/count")]
         [HttpGet]
         public async Task<int> Count() => await DataService.GetRecordListCountAsync();
@@ -1296,9 +1487,16 @@ namespace CEC.Blazor.WASM.Server.Controllers
         [HttpGet]
         public async Task<List<DbWeatherReport>> GetList() => await DataService.GetRecordListAsync();
 
-        [MVC.Route("weatherReport/filteredlist")]
+        [MVC.Route("weatherreport/filteredlist")]
         [HttpPost]
         public async Task<List<DbWeatherReport>> GetFilteredRecordListAsync([FromBody] FilterList filterList) => await DataService.GetFilteredRecordListAsync(filterList);
+
+        [MVC.Route("weatherreport/distinctlist")]
+        [HttpPost]
+        public async Task<List<string>> GetDistinctListAsync([FromBody] DbDistinctRequest req) => await DataService.GetDistinctListAsync(req);
+
+        [MVC.Route("weatherreport/base")]
+        public async Task<List<DbBaseRecord>> GetBaseAsync() => await DataService.GetBaseRecordListAsync<DbWeatherReport>();
 
         [MVC.Route("weatherreport/count")]
         [HttpGet]

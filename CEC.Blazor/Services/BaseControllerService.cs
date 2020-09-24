@@ -323,7 +323,7 @@ namespace CEC.Blazor.Services
             if (!this.IsRecords)
             {
                 if (this.FilterList.Load) this.Records = await this.Service.GetFilteredRecordListAsync(FilterList);
-                else this.Records =  new List<TRecord>();
+                else this.Records = new List<TRecord>();
                 return true;
             }
             return false;
@@ -423,8 +423,28 @@ namespace CEC.Blazor.Services
         /// </summary>
         /// <typeparam name="TLookup"></typeparam>
         /// <returns></returns>
-        public async Task<SortedDictionary<int, string>> GetLookUpListAsync<TLookup>() where TLookup : class, IDbRecord<TLookup> => await Service.GetLookupListAsync<TLookup>();
-        
+        public async Task<SortedDictionary<int, string>> GetLookUpListAsync<TLookup>(string selectAllText = null) where TLookup : class, IDbRecord<TLookup>
+        {
+            var list = await this.Service.GetBaseRecordListAsync<TLookup>();
+            var LookupList = new SortedDictionary<int, string>();
+            if (!string.IsNullOrEmpty(selectAllText)) LookupList.Add(0, selectAllText);
+            list.ForEach(item => LookupList.Add(item.ID, item.DisplayName));
+            return LookupList;
+        }
+
+        /// <summary>
+        /// Method to get a lookup list of values for a Field in TLookup record
+        /// </summary>
+        /// <typeparam name="TLookup"></typeparam>
+        /// <returns></returns>
+        public async Task<List<string>> GetDistinctListAsync(DbDistinctRequest req) => await this.Service.GetDistinctListAsync(req);
+
+        /// <summary>
+        /// Method to get a base record set from an IDbRecord record
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<DbBaseRecord>> GetBaseRecordListAsync<TLookup>() where TLookup : class, IDbRecord<TLookup> => await this.Service.GetBaseRecordListAsync<TLookup>();
+
         /// <summary>
         /// Pseudo Dispose Event - not currently used as Services don't have a Dispose event
         /// </summary>

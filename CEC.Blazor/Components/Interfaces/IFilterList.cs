@@ -91,5 +91,16 @@ namespace CEC.Blazor.Components
             return Filters.ContainsKey(name);
         }
 
+        /// <summary>
+        /// Method to clear a filter out of the filter list
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ClearFilter(string name)
+        {
+            if (Filters.ContainsKey(name)) this.Filters.Remove(name);
+            return !Filters.ContainsKey(name);
+        }
+
     }
 }

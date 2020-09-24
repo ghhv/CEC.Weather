@@ -3,11 +3,12 @@
 @using CEC.Blazor.Components
 @using CEC.Blazor.Components.BaseForms
 @using CEC.Blazor.Components.UIControls
+@using CEC.Blazor.Components.FormControls
 @using CEC.Weather.Data
 @using CEC.FormControls.Components.FormControls
 @using Microsoft.AspNetCore.Components.Forms
 @using Blazored.FluentValidation
- 
+
 
 @inherits EditRecordComponentBase<DbWeatherReport, WeatherForecastDbContext>
 
@@ -46,12 +47,7 @@
                             </UILabelColumn>
 
                             <UIColumn Columns="4">
-                                <FormControlSelect class="form-control" @bind-Value="this.Service.Record.WeatherStationID" RecordValue="@this.Service.ShadowRecord.WeatherStationID">
-                                    @foreach (var item in this.StationLookupList)
-                                    {
-                                        <option value="@item.Key">@item.Value</option>
-                                    }
-                                </FormControlSelect>
+                                <InputControlSelect OptionList="this.StationLookupList" @bind-Value="this.Service.Record.WeatherStationID" RecordValue="@this.Service.ShadowRecord.WeatherStationID"></InputControlSelect>
                             </UIColumn>
 
                         </UIFormRow>

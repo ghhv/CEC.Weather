@@ -2,9 +2,11 @@
 using CEC.Blazor.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace CEC.Blazor.Extensions
@@ -97,6 +99,35 @@ namespace CEC.Blazor.Extensions
 
         /// <summary>
         /// Generic Method to get a record List count from a DbSet
+        /// You must have a DbSet in your DBContext called dbSetName of type object
+        /// public DbSet<object> DistinctList { get; set; }
+        /// </summary>
+        /// <typeparam name="TRecord"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="dbSetName"></param>
+        /// <returns></returns>
+        public async static Task<List<string>> GetDistinctListAsync(this DbContext context, DbDistinctRequest req)
+        {
+            var list = new List<string>();
+            // wrap in a try as there are many things that can go wrong
+            try
+            {
+                //get the DbDistinct DB Set so we can load the query data into it
+                var dbset = GetDbSet<DbDistinct>(context, req.DistinctSetName);
+                // Get the data by building the SQL query to run against the view
+                var dlist = await dbset.FromSqlRaw($"SELECT DISTINCT(CONVERT(varchar(max), {req.FieldName})) as Value FROM vw_{req.QuerySetName} ORDER BY Value").ToListAsync();
+                // Load the results into a string list
+                dlist.ForEach(item => list.Add(item.Value));
+            }
+            catch
+            {
+                throw new ArgumentException("The SQL Query did not complete.  The most likely cause is one of the DbDistinctRequest parameters is incorrect;");
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Generic Method to get a record List count from a DbSet
         /// </summary>
         /// <typeparam name="TRecord"></typeparam>
         /// <param name="context"></param>
@@ -129,12 +160,11 @@ namespace CEC.Blazor.Extensions
         /// <param name="context"></param>
         /// <param name="dbSetName"></param>
         /// <returns></returns>
-        public async static Task<SortedDictionary<int, string>> GetRecordLookupListAsync<TRecord>(this DbContext context, string dbSetName = null) where TRecord : class, IDbRecord<TRecord>
+        public async static Task<List<DbBaseRecord>> GetBaseRecordListAsync<TRecord>(this DbContext context) where TRecord : class, IDbRecord<TRecord>
         {
-
-            var list = new SortedDictionary<int, string>();
-            var dbset = GetDbSet<TRecord>(context, dbSetName);
-            await dbset.ForEachAsync(item => list.Add(item.ID, item.DisplayName));
+            var list = new List<DbBaseRecord>();
+            var dbset = GetDbSet<TRecord>(context, null);
+            await dbset.ForEachAsync(item => list.Add(new DbBaseRecord() { ID = item.ID, DisplayName = item.DisplayName }));
             return list;
         }
 
@@ -145,7 +175,7 @@ namespace CEC.Blazor.Extensions
         /// <param name="context"></param>
         /// <param name="dbSetName"></param>
         /// <returns></returns>
-        private static DbSet<TRecord> GetDbSet<TRecord>(this DbContext context, string dbSetName = null) where TRecord : class, IDbRecord<TRecord>
+        private static DbSet<TRecord> GetDbSet<TRecord>(this DbContext context, string dbSetName = null) where TRecord : class
         {
             // Get the property info object for the DbSet 
             var pinfo = context.GetType().GetProperty(dbSetName ?? IDbRecord<TRecord>.RecordName);

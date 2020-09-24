@@ -12,9 +12,9 @@
             {
                 <!--Farm-->
                 <td>
-                    <label class="" for="FarmID">Farm:</label>
+                    <label class="" for="ID">Weather Station:</label>
                     <div class="">
-                        <InputControlSelect OptionList="this.IdLookupList" @bind-Value="this.ID" DefaultKey="0" DefaultValue="-- ALL STATIONS --" ShowDefaultOption="true"></InputControlSelect>
+                        <InputControlSelect OptionList="this.IdLookupList" @bind-Value="this.ID"></InputControlSelect>
                     </div>
                 </td>
             }
@@ -22,14 +22,14 @@
                 <!--Month-->
                 <label class="">Month:</label>
                 <div class="">
-                    <InputControlSelect OptionList="this.MonthLookupList" @bind-Value="this.Month" DefaultKey="0" DefaultValue="-- ALL MONTHS --" ShowDefaultOption="true"></InputControlSelect>
+                    <InputControlSelect OptionList="this.MonthLookupList" @bind-Value="this.Month"></InputControlSelect>
                 </div>
             </td>
             <td>
                 <!--Year-->
                 <label class="">Year:</label>
                 <div class="">
-                    <InputControlSelect OptionList="this.YearLookupList" @bind-Value="this.Year" DefaultKey="0" DefaultValue="-- ALL YEARS --" ShowDefaultOption="true"></InputControlSelect>
+                    <InputControlSelect OptionList="this.YearLookupList" @bind-Value="this.Year"></InputControlSelect>
                 </div>
             </td>
         </tr>

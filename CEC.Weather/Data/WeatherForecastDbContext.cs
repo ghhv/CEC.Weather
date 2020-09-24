@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CEC.Blazor.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace CEC.Weather.Data
             _id = Guid.NewGuid();
             Debug.WriteLine($"{_id} context created.");
         }
+
+        public DbSet<DbDistinct> DistinctList { get; set; }
 
         public DbSet<DbWeatherForecast> WeatherForecast { get; set; }
 

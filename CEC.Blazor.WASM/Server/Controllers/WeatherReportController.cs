@@ -29,9 +29,16 @@ namespace CEC.Blazor.WASM.Server.Controllers
         [HttpGet]
         public async Task<List<DbWeatherReport>> GetList() => await DataService.GetRecordListAsync();
 
-        [MVC.Route("weatherReport/filteredlist")]
+        [MVC.Route("weatherreport/filteredlist")]
         [HttpPost]
         public async Task<List<DbWeatherReport>> GetFilteredRecordListAsync([FromBody] FilterList filterList) => await DataService.GetFilteredRecordListAsync(filterList);
+
+        [MVC.Route("weatherreport/distinctlist")]
+        [HttpPost]
+        public async Task<List<string>> GetDistinctListAsync([FromBody] DbDistinctRequest req) => await DataService.GetDistinctListAsync(req);
+
+        [MVC.Route("weatherreport/base")]
+        public async Task<List<DbBaseRecord>> GetBaseAsync() => await DataService.GetBaseRecordListAsync<DbWeatherReport>();
 
         [MVC.Route("weatherreport/count")]
         [HttpGet]

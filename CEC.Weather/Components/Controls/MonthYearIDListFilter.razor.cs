@@ -1,13 +1,10 @@
-﻿using CEC.Blazor.Components.FormControls;
-using CEC.Blazor.Services;
+﻿using CEC.Blazor.Data;
 using CEC.Weather.Data;
 using CEC.Weather.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CEC.Weather.Components
@@ -18,13 +15,7 @@ namespace CEC.Weather.Components
         private WeatherReportControllerService Service { get; set; }
 
         [Parameter]
-        public EventCallback<bool> FilterUpdated { get; set; }
-
-        [Parameter]
         public bool ShowID { get; set; } = true;
-
-        [Parameter]
-        public bool ShowAll { get; set; } = true;
 
         private SortedDictionary<int, string> MonthLookupList { get; set; }
 
@@ -43,7 +34,8 @@ namespace CEC.Weather.Components
             get => this.Service.FilterList.TryGetFilter("Month", out object value) ? (int)value : 0;
             set
             {
-                this.Service.FilterList.SetFilter("Month", value);
+                if (value > 0) this.Service.FilterList.SetFilter("Month", value);
+                else this.Service.FilterList.ClearFilter("Month");
                 if (this.Month != this.OldMonth)
                 {
                     this.OldMonth = this.Month;
@@ -57,7 +49,8 @@ namespace CEC.Weather.Components
             get => this.Service.FilterList.TryGetFilter("Year", out object value) ? (int)value : 0;
             set
             {
-                this.Service.FilterList.SetFilter("Year", value);
+                if (value > 0) this.Service.FilterList.SetFilter("Year", value);
+                else this.Service.FilterList.ClearFilter("Year");
                 if (this.Year != this.OldYear)
                 {
                     this.OldYear = this.Year;
@@ -71,7 +64,8 @@ namespace CEC.Weather.Components
             get => this.Service.FilterList.TryGetFilter("WeatherStationID", out object value) ? (int)value : 0;
             set
             {
-                this.Service.FilterList.SetFilter("WeatherStationID", value);
+                if (value > 0) this.Service.FilterList.SetFilter("WeatherStationID", value);
+                else this.Service.FilterList.ClearFilter("WeatherStationID");
                 if (this.ID != this.OldID)
                 {
                     this.OldID = this.ID;
@@ -82,15 +76,22 @@ namespace CEC.Weather.Components
 
         protected override async Task OnInitializedAsync()
         {
-            this.IdLookupList = await Service.GetLookUpListAsync<DbWeatherStation>();
-            this.MonthLookupList = new SortedDictionary<int, string>();
-            this.MonthLookupList.Add(0, "-- ALL --");
-            for (int i = 1; i < 13; i++) this.MonthLookupList.Add(i, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i));
-            this.YearLookupList = new SortedDictionary<int, string>();
-            this.YearLookupList.Add(0, "-- ALL --");
-            for (var year = 1928; year <= DateTime.Now.Year; year++) this.YearLookupList.Add(year, year.ToString());
             this.OldYear = this.Year;
             this.OldMonth = this.Month;
+            await GetLookupsAsync();
+        }
+
+        protected async Task GetLookupsAsync()
+        {
+            this.IdLookupList = await this.Service.GetLookUpListAsync<DbWeatherStation>("-- ALL STATIONS --");
+            this.MonthLookupList = new SortedDictionary<int, string> { { 0, "-- ALL MONTHS --" } };
+            for (int i = 1; i < 13; i++) this.MonthLookupList.Add(i, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i));
+            {
+                var list = await this.Service.GetDistinctListAsync(new DbDistinctRequest() { FieldName = "Year", QuerySetName = "WeatherReport", DistinctSetName = "DistinctList" });
+                this.YearLookupList = new SortedDictionary<int, string> { { 0, "-- ALL YEARS --" } };
+                list.ForEach(item => this.YearLookupList.Add(int.Parse(item), item));
+            }
+
         }
     }
 }
