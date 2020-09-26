@@ -34,7 +34,7 @@ namespace CEC.Blazor.WASM.Server.Controllers
         public async Task<List<DbWeatherForecast>> GetFilteredRecordListAsync([FromBody]FilterList filterList) => await DataService.GetFilteredRecordListAsync(filterList);
 
         [MVC.Route("weatherforecast/base")]
-        public async Task<List<DbBaseRecord>> GetBaseAsync() => await DataService.GetBaseRecordListAsync<DbWeatherStation>();
+        public async Task<List<DbBaseRecord>> GetBaseAsync() => await DataService.GetBaseRecordListAsync<DbWeatherForecast>();
 
         [MVC.Route("weatherforecast/count")]
         [HttpGet]
