@@ -1,5 +1,5 @@
-# CEC.Blazor
+# CEC.Weather
 
-This is the repository for the CEC.Blazor library of tools and components for building a Blazor Projects along with Server and WASM example projects.
+This is the repository for the CEC.Weather Application.  It's a spinoff/manual fork of [CEC.Blazor](https://github.com/ShaunCurtis/CEC.Blazor) demonstrating how to add new record types and their UI Components and Data Services.
 
-There's a set of articles that provide detailed information on the library and example projects in Released Articles.
+Refer back to the main repository for details.
